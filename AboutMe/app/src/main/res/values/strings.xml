@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">About Me</string>
     <string name="name">Bittah Bandit</string>
+    <string name="star_desc">Yellow star</string>
 </resources>
