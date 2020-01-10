@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Color My Views</string>
     <string name="box_one">Box One</string>
+    <string name="square">Square</string>
+    <string name="tall">Tall</string>
+    <string name="wide">Wide</string>
 </resources>
