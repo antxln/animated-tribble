@@ -28,6 +28,7 @@
         android:layout_marginTop="@dimen/margin_wide"
         android:text="@string/square"
         app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintEnd_toStartOf="@+id/wide_box_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/box_one_text" />
 
@@ -36,10 +37,10 @@
         style="@style/WhiteBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="@dimen/margin_wide"
         android:text="@string/wide"
         app:layout_constraintDimensionRatio="w,5:1"
+        app:layout_constraintEnd_toStartOf="@+id/tall_box_text"
         app:layout_constraintStart_toEndOf="@+id/square_box_text"
         app:layout_constraintTop_toBottomOf="@+id/box_one_text" />
 
@@ -48,10 +49,11 @@
         style="@style/WhiteBox"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="@dimen/margin_wide"
+        android:layout_marginEnd="@dimen/margin_wide"
         android:text="@string/tall"
         app:layout_constraintDimensionRatio="h,1:5"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/wide_box_text"
         app:layout_constraintTop_toBottomOf="@+id/box_one_text" />
 
