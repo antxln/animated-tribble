@@ -56,8 +56,11 @@ class GameFragment : Fragment() {
         viewModel.word.observe(this, Observer { newWord ->
             binding.wordText.text = newWord
         })
-        viewModel.gameFinished.observe(this, Observer { gameFinished ->
-            if (gameFinished) gameFinished()
+        viewModel.eventGameFinish.observe(this, Observer { hasFinished ->
+            if (hasFinished) {
+                gameFinished()
+                viewModel.onGameFinishComplete()
+            }
         })
 
         binding.correctButton.setOnClickListener {
