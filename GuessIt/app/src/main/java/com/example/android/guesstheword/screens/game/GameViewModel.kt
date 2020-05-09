@@ -28,7 +28,9 @@ class GameViewModel: ViewModel() {
         // This is the number of milliseconds in a second
         const val ONE_SECOND = 1000L
         // This is the total time of the game
-        const val COUNTDOWN_TIME = 10000L
+        const val COUNTDOWN_TIME = 60000L
+        // This is the time when the phone will vibrate every second
+        const val PANIC_SECONDS = 10
     }
 
     // The current word
@@ -58,21 +60,28 @@ class GameViewModel: ViewModel() {
         DateUtils.formatElapsedTime(time)
     }
 
+    private val _eventVibrate = MutableLiveData<BuzzType>()
+    val eventVibrate : LiveData<BuzzType>
+        get() = _eventVibrate
+
     init {
         resetList()
         nextWord()
         _score.value = 0
-        _eventGameFinish.value = false
 
         timer = object : CountDownTimer(COUNTDOWN_TIME, ONE_SECOND) {
 
             override fun onTick(millisUntilFinished: Long) {
-                _time.value = millisUntilFinished / ONE_SECOND + 1
+                _time.value = millisUntilFinished / ONE_SECOND
+                if (millisUntilFinished / ONE_SECOND <= PANIC_SECONDS) {
+                    _eventVibrate.value = BuzzType.COUNTDOWN_PANIC
+                }
             }
 
             override fun onFinish() {
-                _time.value = DONE / ONE_SECOND
+                _time.value = DONE
                 _eventGameFinish.value = true
+                _eventVibrate.value = BuzzType.GAME_OVER
             }
         }
 
@@ -129,11 +138,16 @@ class GameViewModel: ViewModel() {
 
     fun onCorrect() {
         _score.value = (score.value)?.plus(1)
+        _eventVibrate.value = BuzzType.CORRECT
         nextWord()
     }
 
     fun onGameFinishComplete() {
         _eventGameFinish.value = false
+    }
+
+    fun onVibrateComplete() {
+        _eventVibrate.value = BuzzType.NO_BUZZ
     }
 
     override fun onCleared() {
