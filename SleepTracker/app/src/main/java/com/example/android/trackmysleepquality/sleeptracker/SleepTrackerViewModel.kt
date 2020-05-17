@@ -19,6 +19,8 @@ package com.example.android.trackmysleepquality.sleeptracker
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepNight
+import kotlinx.coroutines.*
 
 /**
  * ViewModel for SleepTrackerFragment.
@@ -26,5 +28,91 @@ import com.example.android.trackmysleepquality.database.SleepDatabaseDao
 class SleepTrackerViewModel(
         val database: SleepDatabaseDao,
         application: Application) : AndroidViewModel(application) {
+
+    private val viewModelJob = Job()
+
+    /**
+     * Cancel all coroutines in the job
+     */
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
+
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    private var tonight: SleepNight? = null
+
+    init {
+        initializeTonight()
+    }
+
+    private fun initializeTonight() {
+        uiScope.launch {
+            tonight = getTonight()
+        }
+    }
+
+    /**
+     * Perform long running database interactions with coroutines
+     * on non-main thread
+     */
+    private suspend fun getTonight(): SleepNight? {
+        return withContext(Dispatchers.IO) {
+            var night = database.getTonight()
+            if (night?.startTimeMilli != night?.endTimeMilli) {
+                night = null
+            }
+            night
+        }
+    }
+
+    /**
+     * Add new SleepNight to database and update most recent night saved
+     */
+    fun onStartTracking() {
+        uiScope.launch {
+            val newNight = SleepNight()
+            insert(newNight)
+            tonight = getTonight()
+        }
+    }
+
+    private suspend fun insert(night: SleepNight) {
+        withContext(Dispatchers.IO) {
+            database.insert(night)
+        }
+    }
+
+    /**
+     * Update end time of current sleep session
+     * and update database
+     */
+    fun onStopTracking() {
+        uiScope.launch {
+            val oldNight = tonight ?: return@launch
+            oldNight.endTimeMilli = System.currentTimeMillis()
+            update(oldNight)
+        }
+    }
+
+    private suspend fun update(night: SleepNight) {
+        withContext(Dispatchers.IO) {
+            database.update(night)
+        }
+    }
+
+    fun onClear() {
+        uiScope.launch {
+            clear()
+            tonight = null
+        }
+    }
+
+    private suspend fun clear() {
+        withContext(Dispatchers.IO) {
+            database.clear()
+        }
+    }
 }
 
