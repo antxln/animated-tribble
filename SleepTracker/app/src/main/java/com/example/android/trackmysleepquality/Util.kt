@@ -61,6 +61,10 @@ fun convertLongToDateString(systemTime: Long): String {
             .format(systemTime).toString()
 }
 
+const val ONE_SECOND = 1000L
+const val ONE_MINUTE = ONE_SECOND * 60
+const val ONE_HOUR = ONE_MINUTE * 60
+
 /**
  * Takes a list of SleepNights and converts and formats it into one string for display.
  *
@@ -88,12 +92,15 @@ fun formatNights(nights: List<SleepNight>, resources: Resources): Spanned {
                 append(resources.getString(R.string.quality))
                 append("\t${convertNumericQualityToString(it.sleepQuality, resources)}<br>")
                 append(resources.getString(R.string.hours_slept))
+                var remainingTimeMilli = it.endTimeMilli.minus(it.startTimeMilli)
                 // Hours
-                append("\t ${it.endTimeMilli.minus(it.startTimeMilli) / 1000 / 60 / 60}:")
+                append("\t ${remainingTimeMilli / ONE_HOUR}:")
+                remainingTimeMilli %= ONE_HOUR
                 // Minutes
-                append("${it.endTimeMilli.minus(it.startTimeMilli) / 1000 / 60}:")
+                append("${remainingTimeMilli / ONE_MINUTE}:")
+                remainingTimeMilli %= ONE_MINUTE
                 // Seconds
-                append("${it.endTimeMilli.minus(it.startTimeMilli) / 1000}<br><br>")
+                append("${remainingTimeMilli / ONE_SECOND}<br><br>")
             }
         }
     }
